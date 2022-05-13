@@ -1,17 +1,8 @@
 // import dotenv to hide credentials
 require('dotenv').config();
-
-// import express and mysql2
-const express = require("express");
+// import mysql2
 const mysql = require("mysql2");
-
-// make port variable, make express a variable
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-// body parser middleware
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+const cTable = require('console.table');
 
 // create the db connection using dotenv
 const db = mysql.createConnection(
@@ -24,8 +15,13 @@ const db = mysql.createConnection(
     console.log(`Connected to the ${process.env.DB_NAME} database`)
 );
 
+const init = () => {
+    const viewDepartmentTable = `SELECT * from department`;
 
-// start the server listening
-app.listen(PORT, () => 
-    console.log(`App listening on port ${PORT}!`)
-);
+    db.query(viewDepartmentTable, function(err, result) {
+        console.log(result);
+        console.table(result);
+    })
+}
+
+init();
