@@ -18,3 +18,61 @@ VALUES
     ("Chief Financial Officer", 150000, 4),
     ("Lawyer", 200000, 5),
     ("Legal Team Lead", 250000, 5);
+
+INSERT INTO employee (first_name, last_name, role_id)
+VALUES     
+    ("Rey", "McSriff", 1),
+    ("Anatoli", "Smorin", 1),
+    ("Karl", "Dandleton", 2),
+    ("Onson", "Sweemey", 3),
+    ("Glenallen", "Mixon", 3),
+    ("Sleve", "McDichael", 4),
+    ("Darryl", "Archideld", 5),
+    ("Mario", "McRlwain", 5),
+    ("Dwigt", "Rortugal", 6),
+    ("Dean", "Wesrey", 7),
+    ("Raul", "Chamgerlain", 7),
+    ("Tony", "Smehrik", 8),
+    ("Bobson", "Dugnutt", 9),
+    ("Mike", "Truk", 9),
+    ("Willie", "Dustice", 10);
+
+UPDATE employee 
+    SET manager_id = 2 
+    WHERE first_name = "Rey";
+
+UPDATE employee 
+    SET manager_id = 2 
+    WHERE first_name = "Anatoli";
+
+UPDATE employee 
+    SET manager_id = 4 
+    WHERE first_name = "Onson";
+
+UPDATE employee 
+    SET manager_id = 4 
+    WHERE first_name = "Glenallen";
+
+UPDATE employee 
+    SET manager_id = 6 
+    WHERE first_name = "Darryl";
+
+UPDATE employee 
+    SET manager_id = 6 
+    WHERE first_name = "Mario";
+
+UPDATE employee 
+    SET manager_id = 8 
+    WHERE first_name = "Dean";
+
+UPDATE employee 
+    SET manager_id = 8 
+    WHERE first_name = "Raul";
+
+UPDATE employee 
+    SET manager_id = 10 
+    WHERE first_name = "Bobson";
+
+UPDATE employee 
+    SET manager_id = 10 
+    WHERE first_name = "Mike";
