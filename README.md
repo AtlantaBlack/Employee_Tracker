@@ -24,6 +24,7 @@ This application uses the following technologies:
 * Node.js
 * Inquirer
 * MySQL2
+* console.table
 
 ## Installation
 
