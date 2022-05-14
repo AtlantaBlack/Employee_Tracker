@@ -39,7 +39,8 @@ const chooseWhatToDo = () => {
                 "Add a role",
                 "Add an employee",
                 new inquirer.Separator(),
-                "Update an employee's role"
+                "Update an employee's role",
+                new inquirer.Separator()
             ]
         })
         .then(answers => {
@@ -79,7 +80,8 @@ const viewAllDepartments = () => {
     db.query(viewDepartmentTable, (err, result) => {
         // console.log(result);
         // console.log("\n");
-        console.table(result);
+        console.table(`\nDepartments`, result);
+        showMenu();
     });
 }
 
@@ -87,7 +89,7 @@ const viewAllDepartments = () => {
 
 
 
-const exit = () => {
+const showMenu = () => {
     return init();
 }
 

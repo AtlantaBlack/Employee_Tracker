@@ -38,41 +38,41 @@ VALUES
     ("Willie", "Dustice", 10);
 
 UPDATE employee 
-    SET manager_id = 2 
+    SET manager_id = 3 
     WHERE first_name = "Rey";
 
 UPDATE employee 
-    SET manager_id = 2 
+    SET manager_id = 3 
     WHERE first_name = "Anatoli";
 
 UPDATE employee 
-    SET manager_id = 4 
+    SET manager_id = 6 
     WHERE first_name = "Onson";
 
 UPDATE employee 
-    SET manager_id = 4 
+    SET manager_id = 6 
     WHERE first_name = "Glenallen";
 
 UPDATE employee 
-    SET manager_id = 6 
+    SET manager_id = 9 
     WHERE first_name = "Darryl";
 
 UPDATE employee 
-    SET manager_id = 6 
+    SET manager_id = 9 
     WHERE first_name = "Mario";
 
 UPDATE employee 
-    SET manager_id = 8 
+    SET manager_id = 12 
     WHERE first_name = "Dean";
 
 UPDATE employee 
-    SET manager_id = 8 
+    SET manager_id = 12 
     WHERE first_name = "Raul";
 
 UPDATE employee 
-    SET manager_id = 10 
+    SET manager_id = 15 
     WHERE first_name = "Bobson";
 
 UPDATE employee 
-    SET manager_id = 10 
+    SET manager_id = 15 
     WHERE first_name = "Mike";
