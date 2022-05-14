@@ -199,14 +199,14 @@ const askRoleQuestions = async () => {
     const insertIntoRole = `
         INSERT INTO role (title, salary, department_id)
         VALUES
-            (?)
+            (?);
     `;
 
-    const roleValues = {
-        title: response.title,
-        salary: response.salary,
-        department_id: response.department
-    };
+    const roleValues = [
+        response.title,
+        response.salary,
+        response.department
+    ];
 
     db.query(insertIntoRole, roleValues, (err, result) => {
         if (err) console.log(err);
