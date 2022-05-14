@@ -147,10 +147,9 @@ const askRoleQuestions = async () => {
     db.query(`SELECT * FROM department`, (err, results) => {
         results.forEach(result => {
             let department = {                
-                id: result.id,
+                value: result.id, // 'value' must be used in order to tie the ID into the 'name'
                 name: result.department_name
             };
-        // departmentChoices.push(result.department_name);
         departmentChoices.push(department);
         });        
         departmentChoices.push(new inquirer.Separator());
@@ -198,8 +197,7 @@ const askRoleQuestions = async () => {
 
     const insertIntoRole = `
         INSERT INTO role (title, salary, department_id)
-        VALUES
-            (?);
+        VALUES (?, ?, ?);
     `;
 
     const roleValues = [
@@ -209,6 +207,8 @@ const askRoleQuestions = async () => {
     ];
 
     db.query(insertIntoRole, roleValues, (err, result) => {
+        console.log(roleValues);
+
         if (err) console.log(err);
         console.log(result);
 
