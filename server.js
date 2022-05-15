@@ -45,6 +45,10 @@ const chooseWhatToDo = () => {
                 "View all employees",
                 new inquirer.Separator(),
 
+                "View employees by manager",
+                "View employees by department",
+                new inquirer.Separator(),
+
                 "Add a department",
                 "Add a role",
                 "Add an employee",
@@ -70,6 +74,15 @@ const chooseWhatToDo = () => {
                 case "View all employees":
                     viewAllEmployees();
                     break;
+
+                case "View employees by manager":
+                    viewEmployeesByManager();
+                    break;
+
+                case "View employees by department":
+                    viewEmployeesByDepartment();
+                    break;
+
                 case "Add a department":
                     addNewDepartment();
                     break;
@@ -149,6 +162,62 @@ const viewAllEmployees = () => {
         showMenu();
     });
 }
+
+const viewEmployeesByManager = () => {
+    let managersList = [];
+
+    db.query(`SELECT * FROM employee`, (err, results) => {
+        if (err) console.log(err);
+
+        results.forEach(result => {
+            if (result.manager_id === null) {
+                managersList.push({
+                    name: `${result.first_name} ${result.last_name}`,
+                    value: result.id
+                });
+            }
+        });  
+        // console.log(managersList);
+
+        questions = [
+            {
+                type: "list",
+                name: "manager",
+                message: "Select the manager whose team you wish to view:",
+                choices: managersList
+            }
+        ];
+
+        inquirer.prompt(questions)
+            .then(answers => {
+                // console.log(answers);
+
+                const viewManagersTeam = `
+                SELECT
+                    e.id AS "Employee ID",
+                    CONCAT(e.first_name, " ", e.last_name) AS "Employee Name"
+                FROM employee e
+                LEFT JOIN employee m
+                    ON e.manager_id = m.id
+                WHERE m.id = ?;
+                `;
+
+                const managerId = answers.manager;
+
+                db.query(viewManagersTeam, managerId, (err, results) => {
+                    if (err) console.log(err);
+
+                    console.table(`\nTeam`, results);
+                    showMenu();
+                })
+
+            });
+    });
+}
+
+// const viewEmployeesByDepartment = () => {
+
+// }
 
 // ----------- ADDING ------------
 
@@ -272,8 +341,9 @@ const addNewEmployee = async () => {
     let roleChoices = [];
     let managerChoices = [];
 
-    db.query(`SELECT * from role`, (err, results) => {
+    db.query(`SELECT * FROM role`, (err, results) => {
         // console.table(results);
+        if (err) console.log(err);
 
         results.forEach(result => {
             let role = {
@@ -286,7 +356,7 @@ const addNewEmployee = async () => {
         // console.log(roleChoices);
     });
 
-    db.query(`SELECT * from employee`, (err, results) => {
+    db.query(`SELECT * FROM employee`, (err, results) => {
         // console.log(results);
 
         const managers = results.filter(result => 
@@ -308,8 +378,7 @@ const addNewEmployee = async () => {
             value: null
         };
 
-        managerChoices.push(newManager);
-        managerChoices.push(new inquirer.Separator());
+        managerChoices.push(newManager, new inquirer.Separator());
         // console.log(managerChoices);
     });
 
@@ -385,7 +454,7 @@ const updateEmployeeRole = async () => {
     let employeesList = [];
     let rolesList = [];
     
-    db.query(`SELECT * from employee`, (err, results) => {
+    db.query(`SELECT * FROM employee`, (err, results) => {
         // console.table(results);
         if (err) console.log(err);
 
@@ -418,13 +487,13 @@ const updateEmployeeRole = async () => {
             {
                 type: "list",
                 name: "employee",
-                message: "Assign new role to which employee?",
+                message: "Select the employee whose role requires updating:",
                 choices: employeesList
             },
             {
                 type: "list",
                 name: "newRoleId",
-                message: "Select their role:",
+                message: "Select their new role:",
                 choices: rolesList
             }
         ];
@@ -446,7 +515,7 @@ const updateEmployeeRole = async () => {
                     if (err) {
                         console.log(err)
                     } else {
-                        console.log(`Successfully assigned new role.\n`);
+                        console.log(`Successfully updated role.\n`);
                         showMenu();
                     }
                 });
@@ -458,7 +527,7 @@ const updateEmployeeManager = () => {
     let employeesList = [];
     let managersList = [];
 
-    db.query(`SELECT * from employee`, (err, results) => {
+    db.query(`SELECT * FROM employee`, (err, results) => {
         if (err) console.log(err);
 
         results.forEach(result => {
@@ -497,13 +566,13 @@ const updateEmployeeManager = () => {
             {
                 type: "list",
                 name: "employee",
-                message: "Assign new manager to which employee?",
+                message: "Select the employee requiring reassignment of their manager:",
                 choices: employeesList
             }, 
             {
                 type: "list",
                 name: "newManagerId",
-                message: "Select their manager:",
+                message: "Select their new manager:",
                 choices: managersList
             }
         ];
@@ -527,7 +596,7 @@ const updateEmployeeManager = () => {
                     if (err) {
                         console.log(err)
                     } else {
-                        console.log(`Successfully assigned new manager.\n`);
+                        console.log(`Successfully updated manager.\n`);
                         showMenu();
                     };
                 })
