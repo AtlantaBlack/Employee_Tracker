@@ -234,7 +234,7 @@ const askEmployeeQuestions = async () => {
 
     const response = await inquirer.prompt(questions);
 
-    console.log(response);
+    // console.log(response);
 
     const insertIntoEmployee = `
         INSERT INTO employee (first_name, last_name, role_id, manager_id)
@@ -252,7 +252,7 @@ const askEmployeeQuestions = async () => {
         if (err) {
             console.log(err);
         } else {
-            console.log(results);
+            console.log(`Successfully added ${employeeValues[0]} ${employeeValues[1]} to the database.\n`);
         }
 
         showMenu();
@@ -326,12 +326,12 @@ const askRoleQuestions = async () => {
     ];
 
     db.query(insertIntoRole, roleValues, (err, result) => {
-        console.log(roleValues);
+        // console.log(roleValues);
 
         if (err) {
             console.log(err)
         } else {
-            console.log(result);  
+            console.log(`Successfully added ${roleValues[0]} to the database.\n`);
         }
 
         showMenu();
@@ -381,11 +381,12 @@ const askDepartmentQuestions = async () => {
         INSERT INTO department (department_name)
         VALUES (?);
     `;
+
     const deptValues = response.departmentName;
 
     db.query(insertIntoDept, deptValues, (err, result) => {
         if (err) {
-            console.log(result);
+            console.log(err);
         } else {
             console.log(`Successfully added ${deptValues} to the database.\n`);
             showMenu();
