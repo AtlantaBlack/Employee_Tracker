@@ -378,8 +378,8 @@ const askEmployeeQuestions = async () => {
 // ----------- UPDATING ------------
 
 const updateEmployeeRole = async () => {
-    const employeesList = [];
-    const rolesList = [];
+    let employeesList = [];
+    let rolesList = [];
     
     db.query(`SELECT * from employee`, (err, results) => {
         // console.table(results);
