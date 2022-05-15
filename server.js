@@ -18,12 +18,12 @@ const db = mysql.createConnection(
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME
     },
-    console.log(`Connected to the ${process.env.DB_NAME} database`)
+    console.log(`Connected to the ${process.env.DB_NAME} database.\n`)
 );
 
-const { departmentQuestions,
-        roleQuestions 
-      } = require('./src/addQuestions');
+// const { departmentQuestions,
+//         roleQuestions 
+//       } = require('./src/addQuestions');
 
 // ---------- global VARIABLES ----------
 
@@ -40,15 +40,23 @@ const chooseWhatToDo = () => {
             name: "action",
             message: "What would you like to do?",
             choices: [
-                "View all departments", "View all roles",
+                new inquirer.Separator(),
+                "View all departments", 
+                "View all roles",
                 "View all employees",
                 new inquirer.Separator(),
+
                 "Add a department",
                 "Add a role",
                 "Add an employee",
                 new inquirer.Separator(),
+
                 "Update an employee's role",
-                new inquirer.Separator()
+                new inquirer.Separator(),
+
+                new inquirer.Separator(),
+                "Exit",
+                new inquirer.Separator(),
             ]
         })
         .then(answers => {
@@ -75,6 +83,7 @@ const chooseWhatToDo = () => {
                     updateEmployeeRole();
                     break;
                 default:
+                    exitApp();
                     break;
             }
         })
@@ -142,9 +151,113 @@ const viewAllEmployees = () => {
 
 
 const askEmployeeQuestions = async () => {
-    // let roleChoices = [];
+    let roleChoices = [];
+    let managerChoices = [];
 
-    // db.query(`SELECT `)
+    db.query(`SELECT * from role`, (err, results) => {
+        // console.table(results);
+
+        results.forEach(result => {
+            let role = {
+                name: result.title,
+                value: result.id
+            };
+        roleChoices.push(role);
+        });
+        roleChoices.push(new inquirer.Separator());
+        // console.log(roleChoices);
+    });
+
+    db.query(`SELECT * from employee`, (err, results) => {
+        // console.log(results);
+
+        const managers = results.filter(result => 
+            result.manager_id === null
+        );
+
+        // console.log(managers);
+
+        managers.forEach(person => {
+            let manager = {
+                name: `${person.first_name} ${person.last_name}`,
+                value: person.id
+            };
+        managerChoices.push(manager);
+        });
+
+        const newManager = {
+            name: `N/A (Employee will be in a lead position)`,
+            value: null
+        };
+
+        managerChoices.push(newManager);
+        managerChoices.push(new inquirer.Separator());
+        // console.log(managerChoices);
+    });
+
+    questions = [
+        {
+            type: "input",
+            name: "firstName",
+            message: "First name of employee being added:",
+            validate(firstName) {
+                if (!firstName) {
+                    return "Please enter the employee's first name.";
+                }
+                return true;
+            }
+        },
+        {
+            type: "input",
+            name: "lastName",
+            message: "Last name of employee being added:",
+            validate(lastName) {
+                if (!lastName) {
+                    return "Please enter the employee's last name.";
+                }
+                return true;
+            }
+        },
+        {
+            type: "list",
+            name: "roleId",
+            message: "Role of employee being added:",
+            choices: roleChoices
+        },
+        {
+            type: "list",
+            name: "managerId",
+            message: "Direct report for employee being added:",
+            choices: managerChoices
+        }
+    ];
+
+    const response = await inquirer.prompt(questions);
+
+    console.log(response);
+
+    const insertIntoEmployee = `
+        INSERT INTO employee (first_name, last_name, role_id, manager_id)
+        VALUES (?, ?, ?, ?);
+    `;
+
+    const employeeValues = [
+        response.firstName,
+        response.lastName,
+        response.roleId,
+        response.managerId
+    ]
+
+    db.query(insertIntoEmployee, employeeValues, (err, results) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(results);
+        }
+
+        showMenu();
+    })
+
 }
 
 const askRoleQuestions = async () => {
@@ -153,8 +266,8 @@ const askRoleQuestions = async () => {
     db.query(`SELECT * FROM department`, (err, results) => {
         results.forEach(result => {
             let department = {                
-                value: result.id, // 'value' must be used in order to tie the ID into the 'name'
-                name: result.department_name
+                name: result.department_name, // 'name' is what shows up in the choices
+                value: result.id // 'value' must be used in order to tie the ID into the 'name'
             };
         departmentChoices.push(department);
         });        
@@ -309,6 +422,12 @@ const askDepartmentQuestions = async () => {
 
 const showMenu = () => {
     return init();
+}
+
+const exitApp = () => {
+    console.log("\nThank you for using the Employee Tracker application.\n")
+    db.end();
+    process.exit();
 }
 
 // ---------- INIT -------------
