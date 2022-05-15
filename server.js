@@ -383,6 +383,81 @@ const updateEmployeeRole = async () => {
     
     db.query(`SELECT * from employee`, (err, results) => {
         // console.table(results);
+        if (err) console.log(err);
+
+        results.forEach(result => {
+            let employee = {
+                name: `${result.first_name} ${result.last_name}`,
+                value: result.id
+            };
+            employeesList.push(employee);
+        });
+        // console.log(employeesList);
+
+        db.query(`SELECT * FROM role`, (err, results) => {
+            // console.log(results);
+            if (err) console.log(err);
+
+            results.forEach(result => {
+                let role = {
+                    name: `${result.title}`,
+                    value: result.id
+                };
+                rolesList.push(role);
+            });
+            // console.log(rolesList);
+        });
+
+        questions = [
+            {
+                type: "list",
+                name: "employee",
+                message: "Update the role for which employee?",
+                choices: employeesList
+            },
+            {
+                type: "list",
+                name: "newRoleId",
+                message: "Assign new role to employee:",
+                choices: rolesList
+            }
+        ];
+        
+        inquirer.prompt(questions)
+            .then(answers => {
+                const updateRole = `
+                    UPDATE employee
+                    SET role_id = ?
+                    WHERE id = ?;
+                `;
+
+                const newRoleValues = [
+                    answers.newRoleId,
+                    answers.employee
+                ];
+
+                db.query(updateRole, newRoleValues, (err, results) => {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        console.log(results);
+                        showMenu();
+                    }
+                });
+            }); 
+    });
+}
+
+/* can work if you put everything inside the first db query
+
+below is the original version where everything was separated
+
+const updateEmployeeRole = async () => {
+    let employeesList = [];
+    let rolesList = [];
+    
+    db.query(`SELECT * from employee`, (err, results) => {
+        // console.table(results);
 
         results.forEach(result => {
             let employee = {
@@ -425,6 +500,7 @@ const updateEmployeeRole = async () => {
 
     const response = await inquirer.prompt(questions);
 }
+*/
 
 
 // ----------- MENU -----------
