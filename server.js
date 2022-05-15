@@ -69,7 +69,7 @@ const chooseWhatToDo = () => {
                     askRoleQuestions();
                     break;
                 case "Add an employee":
-                    addNewEmployee();
+                    askEmployeeQuestions();
                     break;
                 case "Update an employee's role":
                     updateEmployeeRole();
@@ -141,6 +141,12 @@ const viewAllEmployees = () => {
 // ----------- ADDING ------------
 
 
+const askEmployeeQuestions = async () => {
+    // let roleChoices = [];
+
+    // db.query(`SELECT `)
+}
+
 const askRoleQuestions = async () => {
     let departmentChoices = [];
 
@@ -153,47 +159,47 @@ const askRoleQuestions = async () => {
         departmentChoices.push(department);
         });        
         departmentChoices.push(new inquirer.Separator());
-        console.log(departmentChoices);
+        // console.log(departmentChoices);
     });
 
     // questions = roleQuestions(departmentNames);
 
     questions = [
-            {
-                type: "input",
-                name: "title",
-                message: "Title of role being added:",
-                validate(title) {
-                    if (!title) {
-                        return "Please enter the name of the new role.";
-                    }
+        {
+            type: "input",
+            name: "title",
+            message: "Title of role being added:",
+            validate(title) {
+                if (!title) {
+                    return "Please enter the name of the new role.";
+                }
+                return true;
+            }
+        },
+        {
+            type: "input",
+            name: "salary",
+            message: "Salary of role being added:",
+            validate(salary) {
+                if (parseInt(salary) && salary > 0) {
+                    return true;
+                } else if (parseInt(salary) === 0) {
                     return true;
                 }
-            },
-            {
-                type: "input",
-                name: "salary",
-                message: "Salary of role being added:",
-                validate(salary) {
-                    if (parseInt(salary) && salary > 0) {
-                        return true;
-                    } else if (parseInt(salary) === 0) {
-                        return true;
-                    }
-                    return "Please enter a valid number greater than (or equal to) 0.";
-                }
-            },
-            {
-                type: "list",
-                name: "department",
-                message: "Department that this role belongs to:",
-                choices: departmentChoices
+                return "Please enter a valid number greater than (or equal to) 0.";
             }
-        ];
+        },
+        {
+            type: "list",
+            name: "department",
+            message: "Department that this role belongs to:",
+            choices: departmentChoices
+        }
+    ];
 
     const response = await inquirer.prompt(questions);
 
-    console.log(response);
+    // console.log(response);
 
     const insertIntoRole = `
         INSERT INTO role (title, salary, department_id)
@@ -209,61 +215,14 @@ const askRoleQuestions = async () => {
     db.query(insertIntoRole, roleValues, (err, result) => {
         console.log(roleValues);
 
-        if (err) console.log(err);
-        console.log(result);
+        if (err) {
+            console.log(err)
+        } else {
+            console.log(result);  
+        }
 
         showMenu();
     })
-    
-        // .then(answers => {
-        //     const insertIntoRole = `
-        //         INSERT INTO role (title, salary, department_id)
-        //         VALUES
-        //             (?),
-        //     `;
-        //     const roleValues = [
-        //         answers.roleTitle, 
-        //         answers.roleSalary, 
-        //         answers.department
-        //     ];
-
-        //     db.query(insertIntoRole, roleValues, (err, result) => {
-        //         if (err) {
-        //             console.log(result);
-        //         } else {
-        //             console.log(`Successfully added ${roleValues[0]} to the database.\n`);
-        //             showMenu();
-        //         }
-
-        //     });
-        // });
-
-    // questions = await roleQuestions();
-
-    // const response = await inquirer.prompt(questions);
-
-    // return response;
-
-    // roleQuestions()
-    //     .then(answers => console.log(answers));
-
-    // questions.then(console.log(answers));
-    
-    // return new Promise((resolve, reject) => {
-    //     inquirer.prompt(questions)
-    //         .then(answers => {
-    //             console.log(answers);
-    //             resolve(answers);
-    //         });
-    // })
-
-    // return stuff = await inquirer.prompt(questions)
-    //     .then(answers => {
-
-    //         console.log(answers);
-
-
-
 
     //  return inquirer.prompt(questions)
         // .then(answers => {
@@ -340,6 +299,8 @@ const askDepartmentQuestions = async () => {
     //         });
     //     });
 }
+
+
 
 
 
