@@ -33,8 +33,7 @@ let questions = [];
 
 
 const chooseWhatToDo = () => {
-    return inquirer
-        .prompt(
+    return inquirer.prompt(
         {
             type: "list",
             name: "action",
@@ -150,6 +149,121 @@ const viewAllEmployees = () => {
 // ----------- ADDING ------------
 
 
+const askDepartmentQuestions = async () => {
+    // questions = departmentQuestions();
+
+    questions = [
+        {
+            type: "input",
+            name: "departmentName",
+            message: "Name of department being added:",
+            validate(answer) {
+                if (!answer) {
+                    return "Please enter a department name.";
+                }
+                return true;
+            }
+        }
+    ];
+
+    const response = await inquirer.prompt(questions)
+
+    const insertIntoDept = `
+        INSERT INTO department (department_name)
+        VALUES (?);
+    `;
+
+    const deptValues = response.departmentName;
+
+    db.query(insertIntoDept, deptValues, (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(`Successfully added ${deptValues} to the database.\n`);
+            showMenu();
+        }
+
+    });
+}
+
+const askRoleQuestions = async () => {
+    let departmentChoices = [];
+
+    db.query(`SELECT * FROM department`, (err, results) => {
+        results.forEach(result => {
+            let department = {                
+                name: result.department_name, // 'name' is what shows up in the choices
+                value: result.id // 'value' must be used in order to tie the ID into the 'name'
+            };
+            departmentChoices.push(department);
+        });        
+        departmentChoices.push(new inquirer.Separator());
+        // console.log(departmentChoices);
+    });
+
+    // questions = roleQuestions(departmentNames);
+
+    questions = [
+        {
+            type: "input",
+            name: "title",
+            message: "Title of role being added:",
+            validate(title) {
+                if (!title) {
+                    return "Please enter the name of the new role.";
+                }
+                return true;
+            }
+        },
+        {
+            type: "input",
+            name: "salary",
+            message: "Salary of role being added:",
+            validate(salary) {
+                if (parseInt(salary) && salary > 0) {
+                    return true;
+                } else if (parseInt(salary) === 0) {
+                    return true;
+                }
+                return "Please enter a valid number greater than (or equal to) 0.";
+            }
+        },
+        {
+            type: "list",
+            name: "department",
+            message: "Department that this role belongs to:",
+            choices: departmentChoices
+        }
+    ];
+
+    const response = await inquirer.prompt(questions);
+
+    // console.log(response);
+
+    const insertIntoRole = `
+        INSERT INTO role (title, salary, department_id)
+        VALUES (?, ?, ?);
+    `;
+
+    const roleValues = [
+        response.title,
+        response.salary,
+        response.department
+    ];
+
+    db.query(insertIntoRole, roleValues, (err, result) => {
+        // console.log(roleValues);
+
+        if (err) {
+            console.log(err)
+        } else {
+            console.log(`Successfully added ${roleValues[0]} to the database.\n`);
+        }
+
+        showMenu();
+    })
+}
+
 const askEmployeeQuestions = async () => {
     let roleChoices = [];
     let managerChoices = [];
@@ -162,7 +276,7 @@ const askEmployeeQuestions = async () => {
                 name: result.title,
                 value: result.id
             };
-        roleChoices.push(role);
+            roleChoices.push(role);
         });
         roleChoices.push(new inquirer.Separator());
         // console.log(roleChoices);
@@ -182,7 +296,7 @@ const askEmployeeQuestions = async () => {
                 name: `${person.first_name} ${person.last_name}`,
                 value: person.id
             };
-        managerChoices.push(manager);
+            managerChoices.push(manager);
         });
 
         const newManager = {
@@ -260,162 +374,57 @@ const askEmployeeQuestions = async () => {
 
 }
 
-const askRoleQuestions = async () => {
-    let departmentChoices = [];
 
-    db.query(`SELECT * FROM department`, (err, results) => {
+// ----------- UPDATING ------------
+
+const updateEmployeeRole = async () => {
+    const employeesList = [];
+    const rolesList = [];
+    
+    db.query(`SELECT * from employee`, (err, results) => {
+        // console.table(results);
+
         results.forEach(result => {
-            let department = {                
-                name: result.department_name, // 'name' is what shows up in the choices
-                value: result.id // 'value' must be used in order to tie the ID into the 'name'
+            let employee = {
+                name: `${result.first_name} ${result.last_name}`,
+                value: result.id
             };
-        departmentChoices.push(department);
-        });        
-        departmentChoices.push(new inquirer.Separator());
-        // console.log(departmentChoices);
+            employeesList.push(employee);
+        });
+        console.log(employeesList);
     });
 
-    // questions = roleQuestions(departmentNames);
+    db.query(`SELECT * FROM role`, (err, results) => {
+        // console.log(results);
+        if (err) console.log(err);
+
+        results.forEach(result => {
+            let role = {
+                name: `${result.title}`,
+                value: result.id
+            };
+            rolesList.push(role);
+        });
+        console.log(rolesList);
+    });
 
     questions = [
         {
-            type: "input",
-            name: "title",
-            message: "Title of role being added:",
-            validate(title) {
-                if (!title) {
-                    return "Please enter the name of the new role.";
-                }
-                return true;
-            }
-        },
-        {
-            type: "input",
-            name: "salary",
-            message: "Salary of role being added:",
-            validate(salary) {
-                if (parseInt(salary) && salary > 0) {
-                    return true;
-                } else if (parseInt(salary) === 0) {
-                    return true;
-                }
-                return "Please enter a valid number greater than (or equal to) 0.";
-            }
+            type: "list",
+            name: "employee",
+            message: "Update the role for which employee?",
+            choices: employeesList
         },
         {
             type: "list",
-            name: "department",
-            message: "Department that this role belongs to:",
-            choices: departmentChoices
+            name: "newRole",
+            message: "Assign new role to employee:",
+            choices: rolesList
         }
     ];
 
     const response = await inquirer.prompt(questions);
-
-    // console.log(response);
-
-    const insertIntoRole = `
-        INSERT INTO role (title, salary, department_id)
-        VALUES (?, ?, ?);
-    `;
-
-    const roleValues = [
-        response.title,
-        response.salary,
-        response.department
-    ];
-
-    db.query(insertIntoRole, roleValues, (err, result) => {
-        // console.log(roleValues);
-
-        if (err) {
-            console.log(err)
-        } else {
-            console.log(`Successfully added ${roleValues[0]} to the database.\n`);
-        }
-
-        showMenu();
-    })
-
-    //  return inquirer.prompt(questions)
-        // .then(answers => {
-            // const insertIntoRole = `
-            //     INSERT INTO role (title, salary, department_id)
-            //     VALUES
-            //         (?),
-            // `;
-            // const roleValues = [answers.roleTitle, answers.roleSalary, answers.department];
-
-            // db.query(insertIntoRole, roleValues, (err, result) => {
-            //     if (err) {
-            //         console.log(result);
-            //     } else {
-            //         console.log(`Successfully added ${roleValues[0]} to the database.\n`);
-            //         showMenu();
-            //     }
-
-            // });
-        // });
 }
-
-const askDepartmentQuestions = async () => {
-    // questions = departmentQuestions();
-
-    questions = [
-        {
-            type: "input",
-            name: "departmentName",
-            message: "Name of department being added:",
-            validate(answer) {
-                if (!answer) {
-                    return "Please enter a department name.";
-                }
-                return true;
-            }
-        }
-    ];
-
-    const response = await inquirer.prompt(questions)
-
-    const insertIntoDept = `
-        INSERT INTO department (department_name)
-        VALUES (?);
-    `;
-
-    const deptValues = response.departmentName;
-
-    db.query(insertIntoDept, deptValues, (err, result) => {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(`Successfully added ${deptValues} to the database.\n`);
-            showMenu();
-        }
-
-    });
-
-    // return inquirer.prompt(questions)
-    //     .then(answers => {
-    //         const insertIntoDept = `
-    //             INSERT INTO department (department_name)
-    //             VALUES (?);
-    //         `;
-    //         const deptValues = answers.departmentName;
-
-    //         db.query(insertIntoDept, deptValues, (err, result) => {
-    //             if (err) {
-    //                 console.log(result);
-    //             } else {
-    //                 console.log(`Successfully added ${deptValues} to the database.\n`);
-    //                 showMenu();
-    //             }
-
-    //         });
-    //     });
-}
-
-
-
 
 
 // ----------- MENU -----------

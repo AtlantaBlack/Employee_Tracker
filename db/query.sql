@@ -30,7 +30,13 @@ LEFT JOIN role
 LEFT OUTER JOIN employee m
     ON e.manager_id = m.id;
 
-
+-- show employees by manager
+SELECT
+    CONCAT(e.first_name, " ", e.last_name) AS "Employee",
+    CONCAT(m.first_name, " ", m.last_name) AS "Manager"
+FROM employee e
+LEFT JOIN employee m
+    ON e.manager_id = m.id;
 
 
 /* testing stuff
