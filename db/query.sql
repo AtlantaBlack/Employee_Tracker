@@ -30,13 +30,22 @@ LEFT JOIN role
 LEFT OUTER JOIN employee m
     ON e.manager_id = m.id;
 
--- show employees by manager
+-- view employees and their manager
 SELECT
-    CONCAT(e.first_name, " ", e.last_name) AS "Employee",
-    CONCAT(m.first_name, " ", m.last_name) AS "Manager"
+    IFNULL(CONCAT(m.first_name, " ", m.last_name), "Manager") AS "Manager",
+    CONCAT(e.first_name, " ", e.last_name) AS "Employee"
 FROM employee e
 LEFT JOIN employee m
     ON e.manager_id = m.id;
+
+-- view employees under a particular manager
+SELECT
+    IFNULL(CONCAT(m.first_name, " ", m.last_name), "Manager") AS "Manager",
+    CONCAT(e.first_name, " ", e.last_name) AS "Employee"
+FROM employee e
+LEFT JOIN employee m
+    ON e.manager_id = m.id
+WHERE m.id = 1;
 
 
 /* testing stuff

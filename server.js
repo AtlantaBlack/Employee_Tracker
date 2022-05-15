@@ -51,6 +51,7 @@ const chooseWhatToDo = () => {
                 new inquirer.Separator(),
 
                 "Update an employee's role",
+                "Update an employee's manager",
                 new inquirer.Separator(),
 
                 new inquirer.Separator(),
@@ -70,16 +71,19 @@ const chooseWhatToDo = () => {
                     viewAllEmployees();
                     break;
                 case "Add a department":
-                    askDepartmentQuestions();
+                    addNewDepartment();
                     break;
                 case "Add a role":
-                    askRoleQuestions();
+                    addNewRole();
                     break;
                 case "Add an employee":
-                    askEmployeeQuestions();
+                    addNewEmployee();
                     break;
                 case "Update an employee's role":
                     updateEmployeeRole();
+                    break;
+                case "Update an employee's manager":
+                    updateEmployeeManager();
                     break;
                 default:
                     exitApp();
@@ -149,7 +153,7 @@ const viewAllEmployees = () => {
 // ----------- ADDING ------------
 
 
-const askDepartmentQuestions = async () => {
+const addNewDepartment = async () => {
     // questions = departmentQuestions();
 
     questions = [
@@ -186,7 +190,7 @@ const askDepartmentQuestions = async () => {
     });
 }
 
-const askRoleQuestions = async () => {
+const addNewRole = async () => {
     let departmentChoices = [];
 
     db.query(`SELECT * FROM department`, (err, results) => {
@@ -264,7 +268,7 @@ const askRoleQuestions = async () => {
     })
 }
 
-const askEmployeeQuestions = async () => {
+const addNewEmployee = async () => {
     let roleChoices = [];
     let managerChoices = [];
 
@@ -392,6 +396,7 @@ const updateEmployeeRole = async () => {
             };
             employeesList.push(employee);
         });
+        employeesList.push(new inquirer.Separator());
         // console.log(employeesList);
 
         db.query(`SELECT * FROM role`, (err, results) => {
@@ -405,6 +410,7 @@ const updateEmployeeRole = async () => {
                 };
                 rolesList.push(role);
             });
+            rolesList.push(new inquirer.Separator());
             // console.log(rolesList);
         });
 
@@ -412,13 +418,13 @@ const updateEmployeeRole = async () => {
             {
                 type: "list",
                 name: "employee",
-                message: "Update the role for which employee?",
+                message: "Assign new role to which employee?",
                 choices: employeesList
             },
             {
                 type: "list",
                 name: "newRoleId",
-                message: "Assign new role to employee:",
+                message: "Select their role:",
                 choices: rolesList
             }
         ];
@@ -440,12 +446,93 @@ const updateEmployeeRole = async () => {
                     if (err) {
                         console.log(err)
                     } else {
-                        console.log(results);
+                        console.log(`Successfully assigned new role.\n`);
                         showMenu();
                     }
                 });
             }); 
     });
+}
+
+const updateEmployeeManager = () => {
+    let employeesList = [];
+    let managersList = [];
+
+    db.query(`SELECT * from employee`, (err, results) => {
+        if (err) console.log(err);
+
+        results.forEach(result => {
+            const { id, 
+                first_name, 
+                last_name, 
+                manager_id } = result;
+
+            employeesList.push({
+                name: `${first_name} ${last_name}`,
+                value: id
+            });
+
+            if (manager_id === null) {
+                managersList.push({
+                    name: `${first_name} ${last_name}`,
+                    value: id
+                });
+            }
+        });
+        // console.log(employeesList);
+        // console.log(managersList);
+
+
+        employeesList.push(new inquirer.Separator());
+
+        const promotedToManager = {
+            name: `N/A (This person is now in a lead position)`,
+            value: null,
+        }
+
+        managersList.push(promotedToManager, new inquirer.Separator());
+
+
+        questions = [
+            {
+                type: "list",
+                name: "employee",
+                message: "Assign new manager to which employee?",
+                choices: employeesList
+            }, 
+            {
+                type: "list",
+                name: "newManagerId",
+                message: "Select their manager:",
+                choices: managersList
+            }
+        ];
+
+        inquirer.prompt(questions)
+            .then(answers => {
+                // console.log(answers);
+
+                const updateManager = `
+                    UPDATE employee
+                    SET manager_id = ?
+                    WHERE id = ?;
+                `;
+
+                const newManagerValues = [
+                    answers.newManagerId,
+                    answers.employee
+                ];
+
+                db.query(updateManager, newManagerValues, (err, results) => {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        console.log(`Successfully assigned new manager.\n`);
+                        showMenu();
+                    };
+                })
+            })
+    });            
 }
 
 /* can work if you put everything inside the first db query
@@ -504,7 +591,6 @@ const updateEmployeeRole = async () => {
 
 
 // ----------- MENU -----------
-
 
 const showMenu = () => {
     return init();
