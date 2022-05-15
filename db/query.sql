@@ -30,22 +30,54 @@ LEFT JOIN role
 LEFT OUTER JOIN employee m
     ON e.manager_id = m.id;
 
--- view employees and their manager
+-- show managers and employees only:
+-- id, manager, employee
 SELECT
+    e.id AS "Employee ID",
     IFNULL(CONCAT(m.first_name, " ", m.last_name), "Manager") AS "Manager",
     CONCAT(e.first_name, " ", e.last_name) AS "Employee"
 FROM employee e
 LEFT JOIN employee m
     ON e.manager_id = m.id;
 
--- view employees under a particular manager
+-- show employees under a particular manager:
+-- id, manager, employee
 SELECT
+    e.id AS "Employee ID",
     IFNULL(CONCAT(m.first_name, " ", m.last_name), "Manager") AS "Manager",
     CONCAT(e.first_name, " ", e.last_name) AS "Employee"
 FROM employee e
 LEFT JOIN employee m
     ON e.manager_id = m.id
-WHERE m.id = 1;
+WHERE m.id = 1; -- change id to view other teams
+
+-- show employees in all departments:
+-- dept id, dept name, employee, role
+SELECT
+    department.id AS "Dept ID",
+    department.department_name AS "Department",
+    CONCAT(e.first_name, " ", e.last_name) AS "Employee",
+    role.title AS "Role"
+FROM department
+LEFT JOIN role
+    ON role.department_id = department.id
+LEFT JOIN employee e
+    ON e.role_id = role.id;
+
+-- show employees in a particular department:
+-- dept id, dept name, employee, role
+SELECT
+    department.id AS "Dept ID",
+    department.department_name AS "Department",
+    CONCAT(e.first_name, " ", e.last_name) AS "Employee",
+    role.title AS "Role"
+FROM department
+LEFT JOIN role
+    ON role.department_id = department.id
+LEFT JOIN employee e
+    ON e.role_id = role.id
+WHERE department.id = 1; -- change id to view other depts
+
 
 
 /* testing stuff

@@ -195,7 +195,8 @@ const viewEmployeesByManager = () => {
                 const viewManagersTeam = `
                 SELECT
                     e.id AS "Employee ID",
-                    CONCAT(e.first_name, " ", e.last_name) AS "Employee Name"
+                    CONCAT(e.first_name, " ", e.last_name) AS "Employee Name",
+                    IFNULL(CONCAT(m.first_name, " ", m.last_name), "Manager") AS "Manager"
                 FROM employee e
                 LEFT JOIN employee m
                     ON e.manager_id = m.id
@@ -207,7 +208,7 @@ const viewEmployeesByManager = () => {
                 db.query(viewManagersTeam, managerId, (err, results) => {
                     if (err) console.log(err);
 
-                    console.table(`\nTeam`, results);
+                    console.table(`\nTeam by Manager`, results);
                     showMenu();
                 })
 
@@ -215,9 +216,56 @@ const viewEmployeesByManager = () => {
     });
 }
 
-// const viewEmployeesByDepartment = () => {
+const viewEmployeesByDepartment = () => {
+    let departmentChoices = [];
 
-// }
+    db.query(`SELECT * FROM department`, (err, results) => {
+        results.forEach(result => {
+            departmentChoices.push({
+                name: result.department_name,
+                value: result.id
+            });
+        });
+        // console.log(departmentChoices);
+
+        questions = [
+            {
+                type: "list",
+                name: "department",
+                message: "Select the department whose employees you wish to view:",
+                choices: departmentChoices
+            }
+        ];
+
+        inquirer.prompt(questions)
+            .then(answers => {
+                const viewDeptEmployees = `
+                    SELECT
+                        department.id AS "Dept ID",
+                        department.department_name AS "Department",
+                        CONCAT(e.first_name, " ", e.last_name) AS "Employee",
+                        role.title AS "Role"
+                    FROM department
+                    LEFT JOIN role
+                        ON role.department_id = department.id
+                    LEFT JOIN employee e
+                        ON e.role_id = role.id
+                    WHERE department.id = ?;
+                `;
+
+                const deptId = answers.department;
+
+                db.query(viewDeptEmployees, deptId, (err, results) => {
+                    if (err) console.log(err);
+
+                    console.table(`\nEmployees in Department`, results);
+                    showMenu();
+                });
+
+                // console.log(answers);
+            });
+    });
+}
 
 // ----------- ADDING ------------
 
