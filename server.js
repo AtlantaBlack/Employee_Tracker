@@ -766,7 +766,7 @@ const updateEmployeeManager = () => {
 // function to exit the app
 const exitApp = () => {
     // exit message
-    console.log("\nThank you for using the Employee Tracker application.\n")
+    console.log("\nThank you for using the Employee Management System.\n")
     // end db connection
     db.end();
     // exit application
@@ -781,7 +781,7 @@ const showMenu = () => {
 // welcome message
 const welcomeMessage = () => {
     console.log(`
-    Welcome to the Employee Tracker Application!\n\nLet's get started! First, choose what you would like to do:\n`);
+    Welcome to the Employee Management System!\n\nLet's get started! First, choose what you would like to do:\n`);
 }
 
 // welcome to app screen

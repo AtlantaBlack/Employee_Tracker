@@ -1,9 +1,9 @@
-# Employee Tracker
+# Employee Management System
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Description
 
-The Employee Tracker application is a content management system. Users are able to view the departments, roles, and employees within an organisation, as well as add and update sections.
+The Employee Management System application is a content management system. Users are able to view the departments, roles, and employees within an organisation, as well as add and update sections.
 
 ## Table of Contents
 
@@ -30,7 +30,7 @@ This application uses the following technologies:
 
 This application uses Node.js, Inquirer, MySQL 2, and dotenv, and will require installation of these packages to run. Users will also be required to create their own .env file to enable them to connect to the database using their local machine.
 
-First, clone the [Employee Tracker repository](https://github.com/AtlantaBlack/Employee_Tracker) or download the repository to your machine. Then, using Terminal or the command line application of your choice, navigate to the root directory of the Employee Tracker folder.
+First, clone the [Employee Management System repository](https://github.com/AtlantaBlack/Employee_Tracker) or download the repository to your machine. Then, using Terminal or the command line application of your choice, navigate to the root directory of the Employee Management System folder.
 
 ### Installing Node packages
 
@@ -60,7 +60,7 @@ DB_PASSWORD=Put_Your_MySQL_Password_Here
 
 The database for this application will first need to be created locally. Sample data can be added in afterwards
 
-In Terminal, if you are not already in the root directory of Employee Tracker then first navigate there. Then, navigate to the database folder of the application by running the following command:
+In Terminal, if you are not already in the root directory of Employee Management System then first navigate there. Then, navigate to the database folder of the application by running the following command:
 
 `cd db`
 
@@ -85,11 +85,11 @@ And navigate back to the root directory of the application.
 
 `cd ..`
 
-You are ready to start using the Employee Tracker!
+You are ready to start using the Employee Management System!
 
 ## Usage
 
-In order to use the Employee Tracker application, using the Terminal or the Integrated Terminal available on Visual Studio Code, navigate to the root directory of the application folder.
+In order to use the Employee Management System application, using the Terminal or the Integrated Terminal available on Visual Studio Code, navigate to the root directory of the application folder.
 
 Start the application by running the following command:
 
@@ -99,7 +99,7 @@ You will be greeted with a selection of things to do, such as view all departmen
 
 ## Demo
 
-**[Walkthrough video showing Employee Tracker in action](https://drive.google.com/file/d/1egiNfGD1Iil0b7RahMRk0XhDkkdAtwhC/view)**
+**[Walkthrough video showing Employee Management System in action](https://drive.google.com/file/d/1egiNfGD1Iil0b7RahMRk0XhDkkdAtwhC/view)**
 
 ---
 
@@ -107,61 +107,61 @@ You will be greeted with a selection of things to do, such as view all departmen
 
 Below: Gif of video showing sourching schema and seeds
 
-![Demo of Employee Tracker: Sourcing schema and seeds](assets/images/demo-sourcing-schema-seeds.gif?raw=true "Employee Tracker demo sourcing schema and seeds")
+![Demo of Employee Management System: Sourcing schema and seeds](assets/images/demo-sourcing-schema-seeds.gif?raw=true "Employee Management System demo sourcing schema and seeds")
 
 [Video link showing 'View All' selections](https://drive.google.com/file/d/1ODkSsalCyHez5a8xbSAN-CVJDRbefIO8/view)
 
 Below: Gif of video showing 'View All' selections
 
-![Demo of Employee Tracker: View All](assets/images/demo-view-all-sections.gif?raw=true "Employee Tracker demo view all")
+![Demo of Employee Management System: View All](assets/images/demo-view-all-sections.gif?raw=true "Employee Management System demo view all")
 
 [Video link showing 'View By' selections](https://drive.google.com/file/d/1VRUpZCi4gRKmrUXi2_NA-SYn74EBcnhI/view)
 
 Below: Gif of video showing 'View By' selections
 
-![Demo of Employee Tracker: View By](assets/images/demo-view-by-sections.gif?raw=true "Employee Tracker demo view by")
+![Demo of Employee Management System: View By](assets/images/demo-view-by-sections.gif?raw=true "Employee Management System demo view by")
 
 [Video link showing 'Add Department/Add Role' selections](https://drive.google.com/file/d/1aNOx4lL9yl0nL5wIg4DaJOmtWNygCPJy/view)
 
 Below: Gif of video showing 'Add Department/Add Role' selections
 
-![Demo of Employee Tracker: Add Department and Add Role](assets/images/demo-add-depts-add-roles.gif?raw=true "Employee Tracker demo add department and add role")
+![Demo of Employee Management System: Add Department and Add Role](assets/images/demo-add-depts-add-roles.gif?raw=true "Employee Management System demo add department and add role")
 
 [Video Link showing 'Add/Update Employee' selections](https://drive.google.com/file/d/1JmswdJjtDgdN72G-ecTVzfRT3__6cBTt/view)
 
 Below: Gif of video showing 'Add/Update Employee' selections
 
-![Demo of Employee Tracker: Add/Update Employee](assets/images/demo-add-update-employee.gif?raw=true "Employee Tracker demo add and update employee")
+![Demo of Employee Management System: Add/Update Employee](assets/images/demo-add-update-employee.gif?raw=true "Employee Management System demo add and update employee")
 
 ## Screenshots
 
 Sourcing schema and seeds:
 
-![Screenshot of Employee Tracker: Sourcing schema and seeds](assets/images/screenshot-sourcing-schema-seeds.jpg?raw=true "Employee Tracker screenshot sourcing schema and seeds")
+![Screenshot of Employee Management System: Sourcing schema and seeds](assets/images/screenshot-sourcing-schema-seeds.jpg?raw=true "Employee Management System screenshot sourcing schema and seeds")
 
 ---
 
 'View All' selections
 
-![Screenshot of Employee Tracker: View All](assets/images/screenshot-view-all-sections.jpg?raw=true "Employee Tracker screenshot view all")
+![Screenshot of Employee Management System: View All](assets/images/screenshot-view-all-sections.jpg?raw=true "Employee Management System screenshot view all")
 
 ---
 
 'View By' selections
 
-![Screenshot of Employee Tracker: View By](assets/images/screenshot-view-by-sections.jpg?raw=true "Employee Tracker screenshot view by")
+![Screenshot of Employee Management System: View By](assets/images/screenshot-view-by-sections.jpg?raw=true "Employee Management System screenshot view by")
 
 ---
 
 'Add Department/Add Role' selections
 
-![Screenshot of Employee Tracker: Add Department and Add Role](assets/images/screenshot-add-depts-add-roles.jpg?raw=true "Employee Tracker screenshot add department and add role")
+![Screenshot of Employee Management System: Add Department and Add Role](assets/images/screenshot-add-depts-add-roles.jpg?raw=true "Employee Management System screenshot add department and add role")
 
 ---
 
 'Add/Update Employee' selections
 
-![Screenshot of Employee Tracker: Add/Update Employee](assets/images/screenshot-add-update-employee.jpg?raw=true "Employee Tracker screenshot add and update employee")
+![Screenshot of Employee Management System: Add/Update Employee](assets/images/screenshot-add-update-employee.jpg?raw=true "Employee Management System screenshot add and update employee")
 
 ## License
 
