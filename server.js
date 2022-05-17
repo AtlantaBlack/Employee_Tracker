@@ -729,6 +729,10 @@ const updateEmployeeManager = () => {
             .then(answers => {
                 // print results to table in terminal
 
+                if (answers.employee === answers.newManagerId) {
+                    answers.newManagerId = null;
+                }
+
                 // sql query
                 const updateManager = `
                     UPDATE employee
