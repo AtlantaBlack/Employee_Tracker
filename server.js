@@ -1,21 +1,29 @@
-// --------- IMPORTING -----------
+// ====================
+//      IMPORTING
+// ====================
 
 // import dotenv to hide credentials
 require('dotenv').config();
 
-// import console.table
-const consoleTable = require('console.table');
-// import inquirer
-const inquirer = require('inquirer');
-
 // import the db
 const db = require('./config/connection');
 
-// ---------- global VARIABLES ----------
+// import console.table & inquirer
+const inquirer = require('inquirer');
+
+// import utilities
+const consoleTable = require('console.table');
+const capitalise = require('./utils/capitalise');
+
+// ====================
+//   GLOBAL VARIABLES
+// ====================
 
 let questions = [];
 
-// ---------- Initial INQUIRER ----------
+// ====================
+//    ACTION FEATURE
+// ====================
 
 
 const chooseWhatToDo = () => {
@@ -94,8 +102,9 @@ const chooseWhatToDo = () => {
         .catch(err => console.log(err));
 }
 
-
-// ---------- VIEWING ------------
+// ====================
+//    VIEW FEATURES
+// ====================
 
 const viewAllDepartments = () => {
     // sql query
@@ -164,10 +173,9 @@ const viewAllEmployees = () => {
     });
 }
 
-
-
-// ---- VIEW BY PARTICULARS
-
+// ====================
+//   VIEW PARTICULARS
+// ====================
 
 const viewEmployeesByManager = () => {
     // get managers
@@ -254,7 +262,6 @@ const viewEmployeesByManager = () => {
     });
 }
 
-
 const viewEmployeesByDepartment = () => {
     // get departments
     let departmentChoices = []; // empty array to fill up
@@ -336,7 +343,9 @@ const viewEmployeesByDepartment = () => {
     });
 }
 
-// ----------- ADDING ------------
+// ====================
+//   ADDING FEATURES
+// ====================
 
 const addNewDepartment = async () => {
     // set questions
@@ -363,7 +372,7 @@ const addNewDepartment = async () => {
                 VALUES (?);
             `;
             // sql params
-            const deptValues = answers.departmentName;
+            const deptValues = capitalise(answers.departmentName);
 
             db.query(insertIntoDept, deptValues, (err, results) => {
                 // error handling
@@ -437,7 +446,7 @@ const addNewRole = () => {
             `;
             // sql parameters
             const roleValues = [
-                answers.title,
+                capitalise(answers.title),
                 answers.salary,
                 answers.department
             ];
@@ -556,8 +565,8 @@ const addNewEmployee = () => {
             `;
             // sql parameters
             const employeeValues = [
-                answers.firstName,
-                answers.lastName,
+                capitalise(answers.firstName),
+                capitalise(answers.lastName),
                 answers.roleId,
                 answers.managerId
             ]
@@ -575,8 +584,9 @@ const addNewEmployee = () => {
         .catch(err => console.log(err));
 }
 
-
-// ----------- UPDATING ------------
+// ====================
+//   UPDATING FEATURES
+// ====================
 
 const updateEmployeeRole = () => {
     // empty arrays to store employee and roles data
@@ -746,8 +756,9 @@ const updateEmployeeManager = () => {
     });            
 }
 
-
-// ----------- MENU -----------
+// ====================
+//       CONTROLS
+// ====================
 
 // function to exit the app
 const exitApp = () => {
@@ -757,19 +768,32 @@ const exitApp = () => {
     db.end();
     // exit application
     process.exit();
-
 }
 
-// show menu screen
+// menu screen
 const showMenu = () => {
-    return init();
+    chooseWhatToDo(); // present list of action questions
 }
 
-// ---------- INIT -------------
+// welcome message
+const welcomeMessage = () => {
+    console.log(`
+    Welcome to the Employee Tracker Application!\n\nLet's get started! First, choose what you would like to do:\n`);
+}
+
+// welcome to app screen
+const splashScreen = () => {
+    return showMenu();
+}
+
+// ====================
+//    INITIALISATION
+// ====================
 
 // initialise the app
 const init = () => {
-    chooseWhatToDo(); // present list of action questions
+    welcomeMessage();
+    splashScreen();
 }
 
 // start the app!
