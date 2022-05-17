@@ -39,32 +39,33 @@ const chooseWhatToDo = () => {
             name: "action",
             message: "What would you like to do?",
             choices: [
-                new inquirer.Separator(),
+                new inquirer.Separator(), // viewing by all
                 "View all departments", 
                 "View all roles",
                 "View all employees",
-                new inquirer.Separator(),
 
+                new inquirer.Separator(), // viewing by particulars
                 "View employees by manager",
                 "View employees by department",
-                new inquirer.Separator(),
 
+                new inquirer.Separator(), // adding
                 "Add a department",
                 "Add a role",
                 "Add an employee",
-                new inquirer.Separator(),
 
+                new inquirer.Separator(), // updating
                 "Update an employee's role",
                 "Update an employee's manager",
-                new inquirer.Separator(),
 
-                new inquirer.Separator(),
+                new inquirer.Separator(), // exiting app
+                new inquirer.Separator(), // extra formatting
                 "Exit",
                 new inquirer.Separator(),
             ]
         })
         .then(answers => {
             switch (answers.action) {
+                // view by all
                 case "View all departments":
                     viewAllDepartments();
                     break;
@@ -74,15 +75,14 @@ const chooseWhatToDo = () => {
                 case "View all employees":
                     viewAllEmployees();
                     break;
-
+                // view by particulars
                 case "View employees by manager":
                     viewEmployeesByManager();
                     break;
-
                 case "View employees by department":
                     viewEmployeesByDepartment();
                     break;
-
+                // adding
                 case "Add a department":
                     addNewDepartment();
                     break;
@@ -92,12 +92,14 @@ const chooseWhatToDo = () => {
                 case "Add an employee":
                     addNewEmployee();
                     break;
+                // updating
                 case "Update an employee's role":
                     updateEmployeeRole();
                     break;
                 case "Update an employee's manager":
                     updateEmployeeManager();
                     break;
+                // exiting app
                 default:
                     exitApp();
                     break;
@@ -208,10 +210,16 @@ const viewEmployeesByManager = () => {
                 db.query(viewManagersTeam, managerId, (err, results) => {
                     if (err) console.log(err);
 
-                    console.table(`\nTeam by Manager`, results);
-                    showMenu();
-                })
+                    if (results.length === 0) {
+                        console.log(`\nNo employees under this manager.\n`);
+                        return showMenu();
+                    }
 
+                    const managerName = results[0].Manager;
+
+                    console.table(`\nEmployees under ${managerName}`, results);
+                    showMenu();                    
+                });
             });
     });
 }
@@ -241,10 +249,10 @@ const viewEmployeesByDepartment = () => {
             .then(answers => {
                 const viewDeptEmployees = `
                     SELECT
-                        department.id AS "Dept ID",
-                        department.department_name AS "Department",
+                        e.id AS "Employee ID",
                         CONCAT(e.first_name, " ", e.last_name) AS "Employee",
-                        role.title AS "Role"
+                        role.title AS "Role",
+                        department.department_name AS "Department"
                     FROM department
                     LEFT JOIN role
                         ON role.department_id = department.id
@@ -258,7 +266,9 @@ const viewEmployeesByDepartment = () => {
                 db.query(viewDeptEmployees, deptId, (err, results) => {
                     if (err) console.log(err);
 
-                    console.table(`\nEmployees in Department`, results);
+                    const deptName = results[0].Department;
+
+                    console.table(`\nEmployees in ${deptName}`, results);
                     showMenu();
                 });
 

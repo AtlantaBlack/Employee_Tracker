@@ -44,12 +44,12 @@ LEFT JOIN employee m
 -- id, manager, employee
 SELECT
     e.id AS "Employee ID",
-    IFNULL(CONCAT(m.first_name, " ", m.last_name), "Manager") AS "Manager",
-    CONCAT(e.first_name, " ", e.last_name) AS "Employee"
+    CONCAT(e.first_name, " ", e.last_name) AS "Employee Name",
+    IFNULL(CONCAT(m.first_name, " ", m.last_name), "Manager") AS "Manager"
 FROM employee e
 LEFT JOIN employee m
     ON e.manager_id = m.id
-WHERE m.id = 1; -- change id to view other teams
+WHERE m.id = ?; -- change id to view other teams
 
 -- show employees in all departments:
 -- dept id, dept name, employee, role
@@ -67,16 +67,16 @@ LEFT JOIN employee e
 -- show employees in a particular department:
 -- dept id, dept name, employee, role
 SELECT
-    department.id AS "Dept ID",
-    department.department_name AS "Department",
+    e.id AS "Employee ID",
     CONCAT(e.first_name, " ", e.last_name) AS "Employee",
-    role.title AS "Role"
+    role.title AS "Role",
+    department.department_name AS "Department"
 FROM department
 LEFT JOIN role
     ON role.department_id = department.id
 LEFT JOIN employee e
     ON e.role_id = role.id
-WHERE department.id = 1; -- change id to view other depts
+WHERE department.id = ?; -- change id to view other depts
 
 
 
