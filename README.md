@@ -23,12 +23,12 @@ This application uses the following technologies:
 * JavaScript
 * Node.js
 * Inquirer
-* MySQL2
+* MySQL 2
 * console.table
 
 ## Installation
 
-This application uses Node.js, Inquirer, MySQL2, and dotenv, and will require installation of these packages to run. Users will also be required to create their own .env file to enable them to connect to the database using their local machine.
+This application uses Node.js, Inquirer, MySQL 2, and dotenv, and will require installation of these packages to run. Users will also be required to create their own .env file to enable them to connect to the database using their local machine.
 
 First, clone the [Employee Tracker repository](https://github.com/AtlantaBlack/Employee_Tracker) or download the repository to your machine. Then, using Terminal or the command line application of your choice, navigate to the root directory of the Employee Tracker folder.
 
@@ -171,7 +171,37 @@ This project is licensed under the [MIT License](./LICENSE.txt).
 
 ## Resources
 
-* [resource]()
+* [Node.js](https://nodejs.org/en/)
+
+* [dotenv](https://www.npmjs.com/package/dotenv)
+
+* [Node MySQL 2](https://www.npmjs.com/package/mysql2)
+
+* [console.table](https://www.npmjs.com/package/console.table)
+
+* [Inquirer](https://www.npmjs.com/package/inquirer)
+
+* [Pencil Programmer - Self-referencing Foreign Key in MySQL](https://pencilprogrammer.com/self-referencing-foreign-key-in-mysql/)
+
+* [Tech on the Net - Foreign Keys](https://www.techonthenet.com/sql_server/foreign_keys/foreign_delete_null.php)
+
+* [Learn SQL - What is Self Join in SQL?](https://learnsql.com/blog/what-is-self-join-sql/)
+
+* [Learn SQL - How to Learn SQL Joins](https://learnsql.com/blog/learn-and-practice-sql-joins/)
+
+* [MySQL Tutorial - MySQL Self Join](https://www.mysqltutorial.org/mysql-self-join/)
+
+* [MySQL Tutorial - Foreign Key](https://www.mysqltutorial.org/mysql-foreign-key/)
+
+* [W3 Schools - SQL/Join](https://www.w3schools.com/sql/sql_join_left.asp)
+
+* [Stack Overflow - Joining three tables](https://stackoverflow.com/questions/3709560/joining-three-tables-using-mysql/3709583#3709583)
+
+* [W3 Schools - Promises](https://www.w3schools.com/js/js_promise.asp)
+
+* [MDN Web Docs - Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises)
+
+* [JavaScript.info - Promise Chaining](https://javascript.info/promise-chaining)
 
 
 ## Contact
