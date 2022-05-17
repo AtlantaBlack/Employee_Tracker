@@ -22,9 +22,8 @@ const capitalise = require('./utils/capitalise');
 let questions = [];
 
 // ====================
-//    ACTION FEATURE
+//    MENU SELECTION
 // ====================
-
 
 const chooseWhatToDo = () => {
     return inquirer.prompt(
@@ -103,7 +102,7 @@ const chooseWhatToDo = () => {
 }
 
 // ====================
-//    VIEW FEATURES
+//       VIEW ALL
 // ====================
 
 const viewAllDepartments = () => {
@@ -344,7 +343,7 @@ const viewEmployeesByDepartment = () => {
 }
 
 // ====================
-//   ADDING FEATURES
+//    ADD SOMETHING
 // ====================
 
 const addNewDepartment = async () => {
@@ -585,7 +584,7 @@ const addNewEmployee = () => {
 }
 
 // ====================
-//   UPDATING FEATURES
+//   UPDATE SOMETHING
 // ====================
 
 const updateEmployeeRole = () => {
