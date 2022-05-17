@@ -113,6 +113,7 @@ const chooseWhatToDo = () => {
 // ---------- VIEWING ------------
 
 const viewAllDepartments = () => {
+    // sql query
     const viewDepartmentTable = `
         SELECT 
             department.id AS "Department ID",
@@ -120,13 +121,18 @@ const viewAllDepartments = () => {
         FROM department;
     `;
 
-    db.query(viewDepartmentTable, (err, result) => {
-        console.table(`\nDepartments`, result);
+    db.query(viewDepartmentTable, (err, results) => {
+        // error handling
+        if (err) console.log(err);
+        // successful result:
+        console.table(`\nDepartments`, results);
+        // return to main screen
         showMenu();
     });
 }
 
 const viewAllRoles = () => {
+    // sql query
     const viewRolesTable = `
         SELECT     
             role.id AS "Role ID",
@@ -138,8 +144,12 @@ const viewAllRoles = () => {
             ON role.department_id = department.id;
     `;
 
-    db.query(viewRolesTable, (err, result) => {
-        console.table(`\nRoles`, result);
+    db.query(viewRolesTable, (err, results) => {
+        // error handling
+        if (err) console.log(err);
+        // successful result:
+        console.table(`\nRoles`, results);
+        // return to main screen
         showMenu();
     });
 }
@@ -159,41 +169,66 @@ const viewAllEmployees = () => {
             ON e.manager_id = m.id;
     `;
 
-    db.query(viewEmployeesTable, (err, result) => {
-        console.table(`\nEmployees`, result);
+    db.query(viewEmployeesTable, (err, results) => {
+        // error handling
+        if (err) console.log(err);
+        // successful result:
+        console.table(`\nEmployees`, results);
+        // return to main screen
         showMenu();
     });
 }
 
-const viewEmployeesByManager = () => {
-    let managersList = [];
 
+
+// ---- VIEW BY PARTICULARS
+
+
+const viewEmployeesByManager = () => {
+    // get managers
+    let managersList = []; // empty array to fill up
+
+    // database querying to find managers
     db.query(`SELECT * FROM employee`, (err, results) => {
+        // error handling
         if (err) console.log(err);
 
+        // for results:
         results.forEach(result => {
-            if (result.manager_id === null) {
-                managersList.push({
-                    name: `${result.first_name} ${result.last_name}`,
-                    value: result.id
-                });
-            }
-        });  
-        // console.log(managersList);
+            // destructure each result
+            const { 
+                id, first_name, last_name, manager_id 
+            } = result;
 
+            // find all the managers (manager_id = null)
+            if (manager_id === null) {
+                // make a manager object
+                let manager = {
+                    name: `${first_name} ${last_name}`,
+                    value: id
+                }
+                // push the managers into the list array
+                managersList.push(manager);
+            }
+        });
+        managersList.push(new inquirer.Separator()); // formatting
+
+        // create questions to ask
         questions = [
             {
                 type: "list",
                 name: "manager",
                 message: "Select the manager whose team you wish to view:",
-                choices: managersList
+                choices: managersList // managers go here
             }
         ];
 
+        // ask questions to user
         inquirer.prompt(questions)
             .then(answers => {
-                // console.log(answers);
+                // print databse results to table in terminal
 
+                // sql query
                 const viewManagersTeam = `
                 SELECT
                     e.id AS "Employee ID",
@@ -205,48 +240,70 @@ const viewEmployeesByManager = () => {
                 WHERE m.id = ?;
                 `;
 
+                // sql parameters
                 const managerId = answers.manager;
 
+                // query the database using sql and params
                 db.query(viewManagersTeam, managerId, (err, results) => {
+                    // error handling
                     if (err) console.log(err);
 
+                    // if no employees under selected manager
                     if (results.length === 0) {
-                        console.log(`\nNo employees under this manager.\n`);
+                        // special message
+                        console.log(`\nThere are no employees under this manager.\n`);
+                        // return to main screen
                         return showMenu();
                     }
 
+                    // get the manager's name
                     const managerName = results[0].Manager;
 
+                    // make table
                     console.table(`\nEmployees under ${managerName}`, results);
+                    // return to main screen
                     showMenu();                    
                 });
-            });
+            })
+            .catch(err => console.log(err));
     });
 }
 
+
 const viewEmployeesByDepartment = () => {
-    let departmentChoices = [];
+    // get departments
+    let departmentChoices = []; // empty array to fill up
 
     db.query(`SELECT * FROM department`, (err, results) => {
+        // error handling
+        if (err) console.log(err);
+
+        // grab values for each result
         results.forEach(result => {
+            const { id, department_name } = result;
+            // push to departments array
             departmentChoices.push({
-                name: result.department_name,
-                value: result.id
+                name: department_name,
+                value: id
             });
         });
-        // console.log(departmentChoices);
 
+        // make questions
         questions = [
             {
                 type: "list",
                 name: "department",
                 message: "Select the department whose employees you wish to view:",
-                choices: departmentChoices
+                choices: departmentChoices // departments here
             }
         ];
 
+        // ask user the questions
         inquirer.prompt(questions)
             .then(answers => {
+                // print db results to table in terminal 
+
+                // sql query
                 const viewDeptEmployees = `
                     SELECT
                         e.id AS "Employee ID",
@@ -261,28 +318,43 @@ const viewEmployeesByDepartment = () => {
                     WHERE department.id = ?;
                 `;
 
+                // sql params
                 const deptId = answers.department;
 
+                // get results out of db
                 db.query(viewDeptEmployees, deptId, (err, results) => {
+                    // error handling
                     if (err) console.log(err);
 
+                    // results: 
+
+                    // get department name
                     const deptName = results[0].Department;
 
+                    // get first employee name record
+                    const firstEmployee = results[0].Employee;
+
+                    // if there are no employees in a dept
+                    if (!firstEmployee) {
+                        // show special message
+                        console.log(`\nThere are no employees in the ${deptName} department.\n`);
+                        // return to main screen
+                        return showMenu();
+                    }
+                    // make table for results
                     console.table(`\nEmployees in ${deptName}`, results);
+                    // return to main screen
                     showMenu();
                 });
-
-                // console.log(answers);
-            });
+            })
+            .catch(err => console.log(err));
     });
 }
 
 // ----------- ADDING ------------
 
-
 const addNewDepartment = async () => {
-    // questions = departmentQuestions();
-
+    // set questions
     questions = [
         {
             type: "input",
@@ -297,27 +369,32 @@ const addNewDepartment = async () => {
         }
     ];
 
-    const response = await inquirer.prompt(questions)
+    // ask user questions
+    inquirer.prompt(questions)
+        .then(answers => {
+            // sql query
+            const insertIntoDept = `
+                INSERT INTO department (department_name)
+                VALUES (?);
+            `;
+            // sql params
+            const deptValues = answers.departmentName;
 
-    const insertIntoDept = `
-        INSERT INTO department (department_name)
-        VALUES (?);
-    `;
+            db.query(insertIntoDept, deptValues, (err, results) => {
+                // error handling
+                if (err) console.log(err);
 
-    const deptValues = response.departmentName;
-
-    db.query(insertIntoDept, deptValues, (err, result) => {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(`Successfully added ${deptValues} to the database.\n`);
-            showMenu();
-        }
-
-    });
+                // successful results
+                console.log(`\nSuccessfully added ${deptValues} to the database.\n`);
+                // return to main screen
+                showMenu();
+            });
+        })
+        .catch(err => console.log(err));
 }
 
-const addNewRole = async () => {
+const addNewRole = () => {
+    // get department list
     let departmentChoices = [];
 
     db.query(`SELECT * FROM department`, (err, results) => {
@@ -329,11 +406,9 @@ const addNewRole = async () => {
             departmentChoices.push(department);
         });        
         departmentChoices.push(new inquirer.Separator());
-        // console.log(departmentChoices);
     });
 
-    // questions = roleQuestions(departmentNames);
-
+    // set questions
     questions = [
         {
             type: "input",
@@ -367,77 +442,86 @@ const addNewRole = async () => {
         }
     ];
 
-    const response = await inquirer.prompt(questions);
+    // ask user questions
+    inquirer.prompt(questions)
+        .then(answers => {
+            // sql
+            const insertIntoRole = `
+                INSERT INTO role (title, salary, department_id)
+                VALUES (?, ?, ?);
+            `;
+            // sql parameters
+            const roleValues = [
+                answers.title,
+                answers.salary,
+                answers.department
+            ];
+        
+            db.query(insertIntoRole, roleValues, (err, results) => {
+                // error handling
+                if (err) console.log(err);
 
-    // console.log(response);
-
-    const insertIntoRole = `
-        INSERT INTO role (title, salary, department_id)
-        VALUES (?, ?, ?);
-    `;
-
-    const roleValues = [
-        response.title,
-        response.salary,
-        response.department
-    ];
-
-    db.query(insertIntoRole, roleValues, (err, result) => {
-        // console.log(roleValues);
-
-        if (err) {
-            console.log(err)
-        } else {
-            console.log(`Successfully added ${roleValues[0]} to the database.\n`);
-        }
-
-        showMenu();
-    })
+                // successful result:
+                console.log(`\nSuccessfully added ${roleValues[0]} to the database.\n`);
+                // return to main screen
+                showMenu();
+            });
+        })
+        .catch(err => console.log(err));
 }
 
-const addNewEmployee = async () => {
+const addNewEmployee = () => {
+    // grab roles and managers
     let roleChoices = [];
     let managerChoices = [];
 
+    // start db query for getting role
     db.query(`SELECT * FROM role`, (err, results) => {
-        // console.table(results);
         if (err) console.log(err);
 
         results.forEach(result => {
+            const { id, title } = result;
+            // set role object
             let role = {
-                name: result.title,
-                value: result.id
+                name: title,
+                value: id
             };
-            roleChoices.push(role);
+            roleChoices.push(role); // add role to array
         });
+        // add separator for formatting
         roleChoices.push(new inquirer.Separator());
-        // console.log(roleChoices);
     });
 
+    // start db query for getting manager
     db.query(`SELECT * FROM employee`, (err, results) => {
-        // console.log(results);
+        // error handling
+        if (err) console.log(err);
 
-        const managers = results.filter(result => 
-            result.manager_id === null
-        );
+        // for results:
+        results.forEach(result => {
+            // destructure each result
+            const { 
+                id, first_name, last_name, manager_id 
+            } = result;
 
-        // console.log(managers);
-
-        managers.forEach(person => {
-            let manager = {
-                name: `${person.first_name} ${person.last_name}`,
-                value: person.id
-            };
-            managerChoices.push(manager);
+            // find all the managers (manager_id = null)
+            if (manager_id === null) {
+                // make a manager object
+                let manager = {
+                    name: `${first_name} ${last_name}`,
+                    value: id
+                }
+                // push the managers into the list array
+                managerChoices.push(manager);
+            }
         });
-
+        // option to give employee the lead position
         const newManager = {
             name: `N/A (Employee will be in a lead position)`,
             value: null
         };
 
-        managerChoices.push(newManager, new inquirer.Separator());
-        // console.log(managerChoices);
+        managerChoices.push(newManager, new inquirer.Separator()); // add new manager option and formatting
     });
 
     questions = [
@@ -477,107 +561,122 @@ const addNewEmployee = async () => {
         }
     ];
 
-    const response = await inquirer.prompt(questions);
-
-    // console.log(response);
-
-    const insertIntoEmployee = `
-        INSERT INTO employee (first_name, last_name, role_id, manager_id)
-        VALUES (?, ?, ?, ?);
-    `;
-
-    const employeeValues = [
-        response.firstName,
-        response.lastName,
-        response.roleId,
-        response.managerId
-    ]
-
-    db.query(insertIntoEmployee, employeeValues, (err, results) => {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(`Successfully added ${employeeValues[0]} ${employeeValues[1]} to the database.\n`);
-        }
-
-        showMenu();
-    })
-
+    // ask user questions
+    inquirer.prompt(questions)
+        .then(answers => {
+            // sql query
+            const insertIntoEmployee = `
+                INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                VALUES (?, ?, ?, ?);
+            `;
+            // sql parameters
+            const employeeValues = [
+                answers.firstName,
+                answers.lastName,
+                answers.roleId,
+                answers.managerId
+            ]
+            // add into database
+            db.query(insertIntoEmployee, employeeValues, (err, results) => {
+                // error handling
+                if (err) console.log(err);
+                
+                // successful result:
+                console.log(`\nSuccessfully added ${employeeValues[0]} ${employeeValues[1]} to the database.\n`);
+                // return to main screen
+                showMenu();
+            });
+        })
+        .catch(err => console.log(err));
 }
 
 
 // ----------- UPDATING ------------
 
-const updateEmployeeRole = async () => {
+const updateEmployeeRole = () => {
+    // empty arrays to store employee and roles data
     let employeesList = [];
     let rolesList = [];
     
+    // get employee info from database
     db.query(`SELECT * FROM employee`, (err, results) => {
-        // console.table(results);
+        // error handling
         if (err) console.log(err);
 
         results.forEach(result => {
+            const {
+                id, first_name, last_name
+            } = result;
+            // create employee obj
             let employee = {
-                name: `${result.first_name} ${result.last_name}`,
-                value: result.id
+                name: `${first_name} ${last_name}`,
+                value: id
             };
-            employeesList.push(employee);
+            employeesList.push(employee); // add to array
         });
-        employeesList.push(new inquirer.Separator());
-        // console.log(employeesList);
+        employeesList.push(new inquirer.Separator()); // formatting
 
+        // get role info from database
         db.query(`SELECT * FROM role`, (err, results) => {
-            // console.log(results);
+            // error handling
             if (err) console.log(err);
 
             results.forEach(result => {
+                const { id, title } = result;
+                // create role obj
                 let role = {
-                    name: `${result.title}`,
-                    value: result.id
+                    name: `${title}`,
+                    value: id
                 };
-                rolesList.push(role);
+                rolesList.push(role); // add to array
             });
             rolesList.push(new inquirer.Separator());
-            // console.log(rolesList);
         });
 
+        // set questions
         questions = [
             {
                 type: "list",
                 name: "employee",
                 message: "Select the employee whose role requires updating:",
-                choices: employeesList
+                choices: employeesList // employees here
             },
             {
                 type: "list",
                 name: "newRoleId",
                 message: "Select their new role:",
-                choices: rolesList
+                choices: rolesList // roles here
             }
         ];
         
+        // ask user questions
         inquirer.prompt(questions)
             .then(answers => {
+                // print results to table in terminal 
+
+                // sql query
                 const updateRole = `
                     UPDATE employee
                     SET role_id = ?
                     WHERE id = ?;
                 `;
-
+                // sql parameters
                 const newRoleValues = [
                     answers.newRoleId,
                     answers.employee
                 ];
 
                 db.query(updateRole, newRoleValues, (err, results) => {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        console.log(`Successfully updated role.\n`);
-                        showMenu();
-                    }
+                    // error handling
+                    if (err) console.log(err)
+                    
+                    // successful result:
+                    console.log(`\nSuccessfully updated role.\n`);
+                    // return to main screen
+                    showMenu();
                 });
-            }); 
+            })
+            .catch(err => console.log(err)); 
     });
 }
 
@@ -589,150 +688,103 @@ const updateEmployeeManager = () => {
         if (err) console.log(err);
 
         results.forEach(result => {
-            const { id, 
-                first_name, 
-                last_name, 
-                manager_id } = result;
+            const { 
+                id, first_name, last_name, manager_id 
+            } = result;
 
-            employeesList.push({
+            // create employee obj
+            let employee = {
                 name: `${first_name} ${last_name}`,
                 value: id
-            });
+            }
+            // add employees to list
+            employeesList.push(employee);
 
+            // if they are a manager, add to manager list
             if (manager_id === null) {
-                managersList.push({
-                    name: `${first_name} ${last_name}`,
-                    value: id
-                });
+                managersList.push(employee);
             }
         });
-        // console.log(employeesList);
-        // console.log(managersList);
+        employeesList.push(new inquirer.Separator()); // formatting
 
-
-        employeesList.push(new inquirer.Separator());
-
+        // if you want to change someone to be a manager
         const promotedToManager = {
             name: `N/A (This person is now in a lead position)`,
             value: null,
         }
+        managersList.push(promotedToManager, new inquirer.Separator()); // add promoted object and formatting
 
-        managersList.push(promotedToManager, new inquirer.Separator());
-
-
+        // set questions
         questions = [
             {
                 type: "list",
                 name: "employee",
                 message: "Select the employee requiring reassignment of their manager:",
-                choices: employeesList
+                choices: employeesList // employees here
             }, 
             {
                 type: "list",
                 name: "newManagerId",
                 message: "Select their new manager:",
-                choices: managersList
+                choices: managersList // managers here
             }
         ];
 
+        // ask users questions
         inquirer.prompt(questions)
             .then(answers => {
-                // console.log(answers);
+                // print results to table in terminal
 
+                // sql query
                 const updateManager = `
                     UPDATE employee
                     SET manager_id = ?
                     WHERE id = ?;
                 `;
-
+                // sql parameters
                 const newManagerValues = [
                     answers.newManagerId,
                     answers.employee
                 ];
 
                 db.query(updateManager, newManagerValues, (err, results) => {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        console.log(`Successfully updated manager.\n`);
-                        showMenu();
-                    };
-                })
+                    // error handling
+                    if (err) console.log(err);
+
+                    // successful result:
+                    console.log(`\nSuccessfully updated manager.\n`);
+                    // return to main screen:
+                    showMenu();
+                });
             })
+            .catch(err => console.log(err));
     });            
 }
-
-/* can work if you put everything inside the first db query
-
-below is the original version where everything was separated
-
-const updateEmployeeRole = async () => {
-    let employeesList = [];
-    let rolesList = [];
-    
-    db.query(`SELECT * from employee`, (err, results) => {
-        // console.table(results);
-
-        results.forEach(result => {
-            let employee = {
-                name: `${result.first_name} ${result.last_name}`,
-                value: result.id
-            };
-            employeesList.push(employee);
-        });
-        console.log(employeesList);
-    });
-
-    db.query(`SELECT * FROM role`, (err, results) => {
-        // console.log(results);
-        if (err) console.log(err);
-
-        results.forEach(result => {
-            let role = {
-                name: `${result.title}`,
-                value: result.id
-            };
-            rolesList.push(role);
-        });
-        console.log(rolesList);
-    });
-
-    questions = [
-        {
-            type: "list",
-            name: "employee",
-            message: "Update the role for which employee?",
-            choices: employeesList
-        },
-        {
-            type: "list",
-            name: "newRole",
-            message: "Assign new role to employee:",
-            choices: rolesList
-        }
-    ];
-
-    const response = await inquirer.prompt(questions);
-}
-*/
 
 
 // ----------- MENU -----------
 
+// function to exit the app
+const exitApp = () => {
+    // exit message
+    console.log("\nThank you for using the Employee Tracker application.\n")
+    // end db connection
+    db.end();
+    // exit application
+    process.exit();
+
+}
+
+// show menu screen
 const showMenu = () => {
     return init();
 }
 
-const exitApp = () => {
-    console.log("\nThank you for using the Employee Tracker application.\n")
-    db.end();
-    process.exit();
-}
-
 // ---------- INIT -------------
 
+// initialise the app
 const init = () => {
-    chooseWhatToDo();
+    chooseWhatToDo(); // present list of action questions
 }
 
 // start the app!
